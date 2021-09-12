@@ -1,6 +1,7 @@
 const PaginationSize = ({ pageElements, setPageElements }) => {
   return (
     <div>
+      Exibir: &nbsp;
       <select
         value={pageElements}
         onChange={(event) => setPageElements(Number(event.target.value))}

@@ -1,28 +1,13 @@
 import React from 'react';
-import styled from 'styled-components';
+import Sort from '../Sort';
+import Search from '../Search';
 import Pagination from '../Pagination';
 import PaginationSize from '../PaginationSize';
 import { useEffect, useState } from 'react';
-
-const TodosStyle = styled.div`
-  input {
-    margin: 3px;
-  }
-
-  div,
-  li {
-    padding: 10px;
-    margin: 10px;
-    font-size: 20;
-    display: flex;
-  }
-  h1 {
-    margin: 20px;
-  }
-  hr {
-    margin: 20px 20px 10px 10px;
-  }
-`;
+import ItemsStyle from '../ItemsStyle';
+import FiltrosWrapper from '../FiltrosWrapper';
+import Back from '../../images/back.png';
+import { Link } from 'react-router-dom';
 
 function Todos() {
   const [todos, setTodos] = useState([]);
@@ -50,30 +35,6 @@ function Todos() {
     setCurrentPage(0);
   }, [pageElements]);
 
-  const [sorted, setSorted] = useState('');
-
-  function handleListSort(property) {
-    const newList = [...filteredTodos];
-
-    if (!sorted || sorted !== property) {
-      newList.sort((a, b) =>
-        a[property] > b[property] ? 1 : b[property] > a[property] ? -1 : 0
-      );
-      setSorted(property);
-    }
-
-    newList.reverse();
-    setFilteredTodos(newList);
-  }
-
-  function handleSearch(input) {
-    const newList = todos.filter((post) =>
-      post.title.toLowerCase().includes(input.toLowerCase())
-    );
-    setCurrentPage(0);
-    setFilteredTodos(newList);
-  }
-
   function handleSelectComplete(checked) {
     if (checked) {
       const newList = todos.filter((todo) => todo.completed);
@@ -85,51 +46,69 @@ function Todos() {
   }
 
   return (
-    <TodosStyle>
-      <h1>TO-DOs</h1>
-      <input
-        type="text"
-        onChange={(event) => handleSearch(event.target.value)}
-      />
-      <PaginationSize
-        pageElements={pageElements}
-        setPageElements={setPageElements}
-      />
-      <Pagination
-        numPages={numPages}
-        setCurrentPage={setCurrentPage}
-        currentPage={currentPage}
-      />
-      <div>
-        Ordenar por: &nbsp;
-        <button onClick={() => handleListSort('id')}>ID</button>|
-        <button onClick={() => handleListSort('title')}>Título</button>|
-        <button onClick={() => handleListSort('completed')}>Completo</button>
-      </div>
-      <div>
-        <input
-          type="checkbox"
-          id="filtro"
-          onChange={(event) => handleSelectComplete(event.target.checked)}
+    <ItemsStyle>
+      <FiltrosWrapper>
+        <h1>TO-DOs</h1>
+        <Link to="/">
+          <img src={Back} width="25px" height="25px" alt="back" />
+        </Link>
+      </FiltrosWrapper>
+      <FiltrosWrapper>
+        <Sort
+          properties={['id', 'title', 'completed']}
+          showedProperties={['ID', 'Título', 'Completo']}
+          filteredItems={filteredTodos}
+          setFilteredItems={setFilteredTodos}
         />
-        <label htmlFor="filtro">Exibir apenas tarefas completas</label>
-      </div>
+        <Search
+          items={todos}
+          setCurrentPage={setCurrentPage}
+          setFilteredItems={setFilteredTodos}
+        />
+      </FiltrosWrapper>
 
-      <ul>
+      <FiltrosWrapper>
+        <PaginationSize
+          pageElements={pageElements}
+          setPageElements={setPageElements}
+        />
+        <Pagination
+          numPages={numPages}
+          setCurrentPage={setCurrentPage}
+          currentPage={currentPage}
+        />
+      </FiltrosWrapper>
+      <FiltrosWrapper>
+        <div>
+          <input
+            type="checkbox"
+            id="filtro"
+            onChange={(event) => handleSelectComplete(event.target.checked)}
+          />
+          &nbsp;
+          <label htmlFor="filtro">Exibir apenas tarefas completas</label>
+        </div>
+      </FiltrosWrapper>
+
+      <ul className="todoscontainer">
         {currentTodos.map((item) => {
           return (
             <>
-              <li key={item.id}>
+              <li key={item.id} className="todositems">
                 {item.id} |
-                <input type="checkbox" defaultChecked={item.completed} />
-                <p>{item.title}</p>
+                <input
+                  id={item.id}
+                  type="checkbox"
+                  defaultChecked={item.completed}
+                />
+                <label htmlFor={item.id}>{item.title}</label>
               </li>
-              <hr />
+              <hr style={{ margin: '15px' }} />
             </>
           );
         })}
       </ul>
-    </TodosStyle>
+    </ItemsStyle>
   );
 }
 

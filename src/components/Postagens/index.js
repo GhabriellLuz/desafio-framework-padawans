@@ -1,26 +1,13 @@
 import React from 'react';
-import styled from 'styled-components';
+import Sort from '../Sort';
+import Search from '../Search';
+import ItemsStyle from '../ItemsStyle';
 import Pagination from '../Pagination';
 import PaginationSize from '../PaginationSize';
+import FiltrosWrapper from '../FiltrosWrapper';
 import { useEffect, useState } from 'react';
-
-const PostagensStyle = styled.div`
-  h1 {
-    margin: 20px;
-  }
-  h3 {
-    margin: 5px 2px;
-  }
-  hr {
-    margin: 20px 20px 0px 0px;
-  }
-  li,
-  div {
-    padding: 10px;
-    margin: 10px;
-    font-size: 20;
-  }
-`;
+import Back from '../../images/back.png';
+import { Link } from 'react-router-dom';
 
 function Postagens() {
   const [posts, setPosts] = useState([]);
@@ -48,51 +35,39 @@ function Postagens() {
     setCurrentPage(0);
   }, [pageElements]);
 
-  const [sorted, setSorted] = useState('');
-
-  function handleListSort(property) {
-    const newList = [...filteredPosts];
-
-    if (!sorted || sorted !== property) {
-      newList.sort((a, b) =>
-        a[property] > b[property] ? 1 : b[property] > a[property] ? -1 : 0
-      );
-      setSorted(property);
-    }
-
-    newList.reverse();
-    setFilteredPosts(newList);
-  }
-
-  function handleSearch(input) {
-    const newList = posts.filter((post) =>
-      post.title.toLowerCase().includes(input.toLowerCase())
-    );
-    setCurrentPage(0);
-    setFilteredPosts(newList);
-  }
-
   return (
-    <PostagensStyle>
-      <h1>Postagens</h1>
-      <input
-        type="text"
-        onChange={(event) => handleSearch(event.target.value)}
-      />
-      <PaginationSize
-        pageElements={pageElements}
-        setPageElements={setPageElements}
-      />
-      <Pagination
-        numPages={numPages}
-        setCurrentPage={setCurrentPage}
-        currentPage={currentPage}
-      />
-      <div>
-        Ordenar por: &nbsp;
-        <button onClick={() => handleListSort('id')}>ID</button>|
-        <button onClick={() => handleListSort('title')}>Título</button>
-      </div>
+    <ItemsStyle>
+      <FiltrosWrapper>
+        <h1>Postagens</h1>
+        <Link to="/">
+          <img src={Back} width="25px" height="25px" alt="back" />
+        </Link>
+      </FiltrosWrapper>
+      <FiltrosWrapper>
+        <Sort
+          properties={['id', 'title']}
+          showedProperties={['ID', 'Título']}
+          filteredItems={filteredPosts}
+          setFilteredItems={setFilteredPosts}
+        />
+        <Search
+          items={posts}
+          setCurrentPage={setCurrentPage}
+          setFilteredItems={setFilteredPosts}
+        />
+      </FiltrosWrapper>
+
+      <FiltrosWrapper>
+        <PaginationSize
+          pageElements={pageElements}
+          setPageElements={setPageElements}
+        />
+        <Pagination
+          numPages={numPages}
+          setCurrentPage={setCurrentPage}
+          currentPage={currentPage}
+        />
+      </FiltrosWrapper>
 
       <ul>
         {currentPosts.map((item) => {
@@ -106,7 +81,7 @@ function Postagens() {
           );
         })}
       </ul>
-    </PostagensStyle>
+    </ItemsStyle>
   );
 }
 
